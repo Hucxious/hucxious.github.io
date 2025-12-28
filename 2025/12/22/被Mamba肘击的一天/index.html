@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+
+
+<html theme="dark" showBanner="true" hasBanner="true" > 
+<link href="https://cdn.staticfile.org/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet">
+<link href="https://cdn.staticfile.org/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet">
+<link href="https://cdn.staticfile.org/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet">
+<script src="/js/color.global.min.js" ></script>
+<script src="/js/load-settings.js" ></script>
+<head>
+  <meta charset="utf-8">
+  
+  
+  
+
+  
+  <title>被Mamba肘击的一天 | Hucxious&#39; Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="preload" href="/css/fonts/Roboto-Regular.ttf" as="font" type="font/ttf" crossorigin="anonymous">
+  <link rel="preload" href="/css/fonts/Roboto-Bold.ttf" as="font" type="font/ttf" crossorigin="anonymous">
+
+  <meta name="description" content="这几天学习Mamba模型，刚看完论文，打算上Github下载代码来实操一下。本以为凭借多次安装调试yolo的经验，配置个mamba应当轻轻松松，但实则未必。在折腾了一天后，现在总算能基本把该配置的配置好了，写一篇博客记录一下我被“肘击”的一天。 不好！出师未捷身先死 常规操作我在这里就简而言之。刚开始无非是用Anaconda建了一个mamba-base的环境，想着图个方便，就用之前建过的yolov">
+<meta property="og:type" content="article">
+<meta property="og:title" content="被Mamba肘击的一天">
+<meta property="og:url" content="https://hucxious.github.io/2025/12/22/%E8%A2%ABMamba%E8%82%98%E5%87%BB%E7%9A%84%E4%B8%80%E5%A4%A9/index.html">
+<meta property="og:site_name" content="Hucxious&#39; Blog">
+<meta property="og:description" content="这几天学习Mamba模型，刚看完论文，打算上Github下载代码来实操一下。本以为凭借多次安装调试yolo的经验，配置个mamba应当轻轻松松，但实则未必。在折腾了一天后，现在总算能基本把该配置的配置好了，写一篇博客记录一下我被“肘击”的一天。 不好！出师未捷身先死 常规操作我在这里就简而言之。刚开始无非是用Anaconda建了一个mamba-base的环境，想着图个方便，就用之前建过的yolov">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://hucxious.github.io/2025/12/22/%E8%A2%ABMamba%E8%82%98%E5%87%BB%E7%9A%84%E4%B8%80%E5%A4%A9/causal_conv1d_success.png">
+<meta property="og:image" content="https://hucxious.github.io/2025/12/22/%E8%A2%ABMamba%E8%82%98%E5%87%BB%E7%9A%84%E4%B8%80%E5%A4%A9/mamba_ssm_success.png">
+<meta property="og:image" content="https://hucxious.github.io/2025/12/22/%E8%A2%ABMamba%E8%82%98%E5%87%BB%E7%9A%84%E4%B8%80%E5%A4%A9/mamba_test_failure.png">
+<meta property="og:image" content="https://hucxious.github.io/2025/12/22/%E8%A2%ABMamba%E8%82%98%E5%87%BB%E7%9A%84%E4%B8%80%E5%A4%A9/final_succees.png">
+<meta property="article:published_time" content="2025-12-22T06:35:41.000Z">
+<meta property="article:modified_time" content="2025-12-22T07:10:51.432Z">
+<meta property="article:author" content="Hucxious">
+<meta property="article:tag" content="AI">
+<meta property="article:tag" content="深度学习">
+<meta property="article:tag" content="Mamba模型">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://hucxious.github.io/2025/12/22/%E8%A2%ABMamba%E8%82%98%E5%87%BB%E7%9A%84%E4%B8%80%E5%A4%A9/causal_conv1d_success.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Hucxious' Blog" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/marcus.jpg">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  
+  
+    
+<div id="banner" class="">
+  <img src="/marcus.jpg" itemprop="image">
+  <div id="banner-dim"></div>
+</div>
+ 
+   
+  <div id="main-grid" class="  ">
+    <div id="nav" class=""  >
+      <navbar id="navbar">
+  <nav id="title-nav">
+    <a href="/">
+      <div id="vivia-logo">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+      <div>Hucxious' Blog </div>
+    </a>
+  </nav>
+  <nav id="main-nav">
+    
+      <a class="main-nav-link" href="/">Home</a>
+    
+      <a class="main-nav-link" href="/archives">Archives</a>
+    
+      <a class="main-nav-link" href="/about">About</a>
+    
+  </nav>
+  <nav id="sub-nav">
+    <a id="theme-btn" class="nav-icon">
+      <span class="light-mode-icon"><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20"><path d="M438.5-829.913v-48q0-17.452 11.963-29.476 11.964-12.024 29.326-12.024 17.363 0 29.537 12.024t12.174 29.476v48q0 17.452-11.963 29.476-11.964 12.024-29.326 12.024-17.363 0-29.537-12.024T438.5-829.913Zm0 747.826v-48q0-17.452 11.963-29.476 11.964-12.024 29.326-12.024 17.363 0 29.537 12.024t12.174 29.476v48q0 17.452-11.963 29.476-11.964 12.024-29.326 12.024-17.363 0-29.537-12.024T438.5-82.087ZM877.913-438.5h-48q-17.452 0-29.476-11.963-12.024-11.964-12.024-29.326 0-17.363 12.024-29.537t29.476-12.174h48q17.452 0 29.476 11.963 12.024 11.964 12.024 29.326 0 17.363-12.024 29.537T877.913-438.5Zm-747.826 0h-48q-17.452 0-29.476-11.963-12.024-11.964-12.024-29.326 0-17.363 12.024-29.537T82.087-521.5h48q17.452 0 29.476 11.963 12.024 11.964 12.024 29.326 0 17.363-12.024 29.537T130.087-438.5Zm660.174-290.87-34.239 32q-12.913 12.674-29.565 12.174-16.653-.5-29.327-13.174-12.674-12.673-12.554-28.826.12-16.152 12.794-28.826l33-35q12.913-12.674 30.454-12.674t30.163 12.847q12.709 12.846 12.328 30.826-.38 17.98-13.054 30.653ZM262.63-203.978l-32 34q-12.913 12.674-30.454 12.674t-30.163-12.847q-12.709-12.846-12.328-30.826.38-17.98 13.054-30.653l33.239-31q12.913-12.674 29.565-12.174 16.653.5 29.327 13.174 12.674 12.673 12.554 28.826-.12 16.152-12.794 28.826Zm466.74 33.239-32-33.239q-12.674-12.913-12.174-29.565.5-16.653 13.174-29.327 12.673-12.674 28.826-13.054 16.152-.38 28.826 12.294l35 33q12.674 12.913 12.674 30.454t-12.847 30.163q-12.846 12.709-30.826 12.328-17.98-.38-30.653-13.054ZM203.978-697.37l-34-33q-12.674-12.913-13.174-29.945-.5-17.033 12.174-29.707t31.326-13.293q18.653-.62 31.326 13.054l32 34.239q11.674 12.913 11.174 29.565-.5 16.653-13.174 29.327-12.673 12.674-28.826 12.554-16.152-.12-28.826-12.794ZM480-240q-100 0-170-70t-70-170q0-100 70-170t170-70q100 0 170 70t70 170q0 100-70 170t-170 70Zm-.247-82q65.703 0 111.475-46.272Q637-414.544 637-480.247t-45.525-111.228Q545.95-637 480.247-637t-111.475 45.525Q323-545.95 323-480.247t45.525 111.975Q414.05-322 479.753-322ZM481-481Z"/></svg></span>
+      <span class="dark-mode-icon"><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20"><path d="M480.239-116.413q-152.63 0-258.228-105.478Q116.413-327.37 116.413-480q0-130.935 77.739-227.435t206.304-125.043q43.022-9.631 63.87 10.869t3.478 62.805q-8.891 22.043-14.315 44.463-5.424 22.42-5.424 46.689 0 91.694 64.326 155.879 64.325 64.186 156.218 64.186 24.369 0 46.978-4.946 22.609-4.945 44.413-14.076 42.826-17.369 62.967 1.142 20.142 18.511 10.511 61.054Q807.174-280 712.63-198.206q-94.543 81.793-232.391 81.793Zm0-95q79.783 0 143.337-40.217 63.554-40.218 95.793-108.283-15.608 4.044-31.097 5.326-15.49 1.283-31.859.805-123.706-4.066-210.777-90.539-87.071-86.473-91.614-212.092-.24-16.369.923-31.978 1.164-15.609 5.446-30.978-67.826 32.478-108.282 96.152Q211.652-559.543 211.652-480q0 111.929 78.329 190.258 78.329 78.329 190.258 78.329ZM466.13-465.891Z"/></svg></span>
+    </a>
+    
+      <a id="nav-rss-link" class="nav-icon mobile-hide" href="/atom.xml" title="RSS Feed">
+        <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20"><path d="M198-120q-25.846 0-44.23-18.384-18.384-18.385-18.384-44.23 0-25.846 18.384-44.23 18.384-18.385 44.23-18.385 25.846 0 44.23 18.385 18.384 18.384 18.384 44.23 0 25.845-18.384 44.23Q223.846-120 198-120Zm538.385 0q-18.846 0-32.923-13.769-14.076-13.769-15.922-33.23-8.692-100.616-51.077-188.654-42.385-88.039-109.885-155.539-67.5-67.501-155.539-109.885Q283-663.462 182.385-672.154q-19.461-1.846-33.23-16.23-13.769-14.385-13.769-33.846t14.076-32.922q14.077-13.461 32.923-12.23 120.076 8.692 226.038 58.768 105.961 50.077 185.73 129.846 79.769 79.769 129.846 185.731 50.077 105.961 58.769 226.038 1.231 18.846-12.538 32.922Q756.461-120 736.385-120Zm-252 0q-18.231 0-32.423-13.461t-18.653-33.538Q418.155-264.23 348.886-333.5q-69.27-69.27-166.501-84.423-20.077-4.462-33.538-18.961-13.461-14.5-13.461-33.346 0-19.076 13.884-33.23 13.884-14.153 33.115-10.922 136.769 15.384 234.384 112.999 97.615 97.615 112.999 234.384 3.231 19.23-10.538 33.115Q505.461-120 484.385-120Z"/></svg>
+      </a>
+    
+    <div id="nav-menu-btn" class="nav-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20"><path d="M177.37-252.282q-17.453 0-29.477-11.964-12.024-11.963-12.024-29.326t12.024-29.537q12.024-12.174 29.477-12.174h605.26q17.453 0 29.477 11.964 12.024 11.963 12.024 29.326t-12.024 29.537q-12.024 12.174-29.477 12.174H177.37Zm0-186.218q-17.453 0-29.477-11.963-12.024-11.964-12.024-29.326 0-17.363 12.024-29.537T177.37-521.5h605.26q17.453 0 29.477 11.963 12.024 11.964 12.024 29.326 0 17.363-12.024 29.537T782.63-438.5H177.37Zm0-186.217q-17.453 0-29.477-11.964-12.024-11.963-12.024-29.326t12.024-29.537q12.024-12.174 29.477-12.174h605.26q17.453 0 29.477 11.964 12.024 11.963 12.024 29.326t-12.024 29.537q-12.024 12.174-29.477 12.174H177.37Z"/></svg>
+    </div>
+  </nav>
+</navbar>
+<div id="nav-dropdown" class="hidden">
+  <div id="dropdown-link-list">
+    
+      <a class="nav-dropdown-link" href="/">Home</a>
+    
+      <a class="nav-dropdown-link" href="/archives">Archives</a>
+    
+      <a class="nav-dropdown-link" href="/about">About</a>
+    
+    
+      <a class="nav-dropdown-link" href="/atom.xml" title="RSS Feed">RSS</a>
+     
+    </div>
+</div>
+<script>
+  let dropdownBtn = document.getElementById("nav-menu-btn");
+  let dropdownEle = document.getElementById("nav-dropdown");
+  dropdownBtn.onclick = function() {
+    dropdownEle.classList.toggle("hidden");
+  }
+</script>
+    </div>
+    <div id="sidebar-wrapper">
+      <sidebar id="sidebar">
+  
+    <div class="widget-wrap">
+  <div class="info-card">
+    <div class="avatar">
+      
+        <image src=/marcus.jpg></image>
+      
+      <div class="img-dim"></div>
+    </div>
+    <div class="info">
+      <div class="username">Hucxious </div>
+      <div class="dot"></div>
+      <div class="subtitle">Stay Hungry, Stay Foolish. </div>
+      <div class="link-list">
+        
+          <a class="link-btn" target="_blank" rel="noopener" href="https://twitter.com" title="Twitter"><i class="fa-brands fa-twitter"></i></a>
+        
+          <a class="link-btn" target="_blank" rel="noopener" href="https://store.steampowered.com" title="Steam"><i class="fa-brands fa-steam"></i></a>
+        
+          <a class="link-btn" target="_blank" rel="noopener" href="https://github.com/Hucxious" title="GitHub"><i class="fa-brands fa-github"></i></a>
+         
+      </div>  
+    </div>
+  </div>
+</div>
+
+  
+  <div class="sticky">
+    
+      
+
+
+  <div class="widget-wrap">
+    <div class="widget">
+      <h3 class="widget-title">Categories</h3>
+      <div class="category-box">
+            <a class="category-link" href="/categories/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/">
+                论文阅读
+                <div class="category-count">1</div>
+            </a>
+        </div>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget-wrap">
+    <div class="widget">
+      <h3 class="widget-title">Tags</h3>
+      <ul class="widget-tag-list" itemprop="keywords"><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/AI/" rel="tag">AI</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/Mamba%E6%A8%A1%E5%9E%8B/" rel="tag">Mamba模型</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">深度学习</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/" rel="tag">论文阅读</a></li></ul>
+    </div>
+  </div>
+
+
+    
+  </div>
+</sidebar>
+    </div>
+    <div id="content-body">
+       
+
+
+<article id="post-被Mamba肘击的一天" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  
+    
+   
+  <div class="article-inner">
+    <div class="article-main">
+      <header class="article-header">
+        
+<div class="main-title-bar">
+  <div class="main-title-dot"></div>
+  
+    
+      <h1 class="p-name article-title" itemprop="headline name">
+        被Mamba肘击的一天
+      </h1>
+    
+  
+</div>
+
+        <div class='meta-info-bar'>
+          <div class="meta-info">
+  <time class="dt-published" datetime="2025-12-22T06:35:41.000Z" itemprop="datePublished">2025-12-22</time>
+</div>
+          <div class="need-seperator meta-info">
+            <div class="meta-cate-flex">
+  
+    Uncategorized 
+   
+</div>
+  
+          </div>
+          <div class="wordcount need-seperator meta-info">
+            11k words 
+          </div>
+        </div>
+        
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/AI/" rel="tag">AI</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Mamba%E6%A8%A1%E5%9E%8B/" rel="tag">Mamba模型</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">深度学习</a></li></ul>
+
+      </header>
+      <div class="e-content article-entry" itemprop="articleBody">
+        
+          <p>这几天学习Mamba模型，刚看完论文，打算上Github下载代码来实操一下。本以为凭借多次安装调试yolo的经验，配置个mamba应当轻轻松松，但实则未必。在折腾了一天后，现在总算能基本把该配置的配置好了，写一篇博客记录一下我被“肘击”的一天。</p>
+<h2 id="不好！出师未捷身先死">不好！出师未捷身先死</h2>
+<p>常规操作我在这里就简而言之。刚开始无非是用Anaconda建了一个mamba-base的环境，想着图个方便，就用之前建过的yolov8-base的环境clone一下。我的yolov8-base的配置如下：</p>
+<table>
+<thead>
+<tr>
+<th>配置</th>
+<th>版本</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CUDA</td>
+<td>12.6</td>
+</tr>
+<tr>
+<td>torch</td>
+<td>2.7.1+cu126</td>
+</tr>
+<tr>
+<td>torchvision</td>
+<td>0.22.1+cu126</td>
+</tr>
+<tr>
+<td>torchaudio</td>
+<td>2.7.1+cu126</td>
+</tr>
+</tbody>
+</table>
+<p>测试代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torch  <span class="comment"># 如果pytorch安装成功即可导入</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(torch.cuda.is_available())  <span class="comment"># 查看CUDA是否可用</span></span><br><span class="line"><span class="built_in">print</span>(torch.cuda.device_count())  <span class="comment"># 查看可用的CUDA数量</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;PyTorch版本: <span class="subst">&#123;torch.__version__&#125;</span>&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;CUDA是否可用: <span class="subst">&#123;torch.cuda.is_available()&#125;</span>&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;CUDA版本: <span class="subst">&#123;torch.version.cuda&#125;</span>&quot;</span>)</span><br></pre></td></tr></table></figure>
+<p>输出结果为：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="literal">True</span></span><br><span class="line"><span class="number">1</span></span><br><span class="line">PyTorch版本: <span class="number">2.7</span><span class="number">.1</span>+cu126</span><br><span class="line">CUDA是否可用: <span class="literal">True</span></span><br><span class="line">CUDA版本: <span class="number">12.6</span></span><br></pre></td></tr></table></figure>
+<p>在cmd命令行输入<code>nvcc -V</code>，其结果如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">nvcc: NVIDIA (R) Cuda compiler driver</span><br><span class="line">Copyright (c) 2005-2024 NVIDIA Corporation</span><br><span class="line">Built on Thu_Sep_12_02:55:00_Pacific_Daylight_Time_2024</span><br><span class="line">Cuda compilation tools, release 12.6, V12.6.77</span><br><span class="line">Build cuda_12.6.r12.6/compiler.34841621_0</span><br></pre></td></tr></table></figure>
+<p>显然相关配置均无问题。</p>
+<p>我首先参考的教程是<a target="_blank" rel="noopener" href="https://blog.csdn.net/yyywxk/article/details/140418043">VMamba 安装教程（无需更改base环境中的cuda版本）</a>。前面基本上都是按着他的操作的，但是</p>
+<p>我遇到的第一个报错信息就是如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">(mamba) PS F:\Temp\Mamba\causal-conv1d&gt; pip install .</span><br><span class="line">Processing f:\temp\mamba\causal-conv1d</span><br><span class="line">  Installing build dependencies ... <span class="keyword">done</span></span><br><span class="line">  Getting requirements to build wheel ... error</span><br><span class="line">  error: subprocess-exited-with-error</span><br><span class="line"></span><br><span class="line">  × Getting requirements to build wheel did not run successfully.</span><br><span class="line">  │ <span class="built_in">exit</span> code: 1</span><br><span class="line">  ╰─&gt; [23 lines of output]</span><br><span class="line">      C:\Users\24541\AppData\Local\Temp\pip-build-env-xx5hh2b7\overlay\Lib\site-packages\torch\_subclasses\functional_tensor.py:279: UserWarning: Failed to initialize NumPy: No module named <span class="string">&#x27;numpy&#x27;</span> (Triggered internally at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\utils\tensor_numpy.cpp:84.)</span><br><span class="line">        cpu = _conversion_method_template(device=torch.device(<span class="string">&quot;cpu&quot;</span>))</span><br><span class="line">      &lt;string&gt;:119: UserWarning: causal_conv1d was requested, but nvcc was not found.  Are you sure your environment has nvcc available?  If you<span class="string">&#x27;re installing within a container from https://hub.docker.com/r/pytorch/pytorch, only images whose names contain &#x27;</span>devel<span class="string">&#x27; will provide nvcc.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">      torch.__version__  = 2.9.1+cpu</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">      Traceback (most recent call last):</span></span><br><span class="line"><span class="string">        File &quot;D:\Anaconda\envs\mamba\lib\site-packages\pip\_vendor\pyproject_hooks\_in_process\_in_process.py&quot;, line 389, in &lt;module&gt;</span></span><br><span class="line"><span class="string">          main()</span></span><br><span class="line"><span class="string">        File &quot;D:\Anaconda\envs\mamba\lib\site-packages\pip\_vendor\pyproject_hooks\_in_process\_in_process.py&quot;, line 373, in main</span></span><br><span class="line"><span class="string">          json_out[&quot;return_val&quot;] = hook(**hook_input[&quot;kwargs&quot;])</span></span><br><span class="line"><span class="string">        File &quot;D:\Anaconda\envs\mamba\lib\site-packages\pip\_vendor\pyproject_hooks\_in_process\_in_process.py&quot;, line 143, in get_requires_for_build_wheel</span></span><br><span class="line"><span class="string">          return hook(config_settings)</span></span><br><span class="line"><span class="string">        File &quot;C:\Users\24541\AppData\Local\Temp\pip-build-env-xx5hh2b7\overlay\Lib\site-packages\setuptools\build_meta.py&quot;, line 331, in get_requires_for_build_wheel</span></span><br><span class="line"><span class="string">          return self._get_build_requires(config_settings, requirements=[])</span></span><br><span class="line"><span class="string">        File &quot;C:\Users\24541\AppData\Local\Temp\pip-build-env-xx5hh2b7\overlay\Lib\site-packages\setuptools\build_meta.py&quot;, line 301, in _get_build_requires</span></span><br><span class="line"><span class="string">          self.run_setup()</span></span><br><span class="line"><span class="string">        File &quot;C:\Users\24541\AppData\Local\Temp\pip-build-env-xx5hh2b7\overlay\Lib\site-packages\setuptools\build_meta.py&quot;, line 317, in run_setup</span></span><br><span class="line"><span class="string">          exec(code, locals())</span></span><br><span class="line"><span class="string">        File &quot;&lt;string&gt;&quot;, line 176, in &lt;module&gt;</span></span><br><span class="line"><span class="string">      NameError: name &#x27;</span>bare_metal_version<span class="string">&#x27; is not defined</span></span><br><span class="line"><span class="string">      [end of output]</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">  note: This error originates from a subprocess, and is likely not a problem with pip.</span></span><br><span class="line"><span class="string">ERROR: Failed to build &#x27;</span>file:///F:/Temp/Mamba/causal-conv1d<span class="string">&#x27; when getting requirements to build wheel```</span></span><br></pre></td></tr></table></figure>
+<p>我在他所提到的 <strong>报错及解决</strong> 这一栏中并没有找到相关报错。光看这段报错，我倒是有不少疑问：</p>
+<ol>
+<li class="lvl-3">
+<p>报错显示<code>torch.__version__  = 2.9.1+cpu</code>，但我用python的测试输出明明已经是<code>torch 2.7.1+cu126</code>。</p>
+</li>
+<li class="lvl-3">
+<p>报错显示<code>NumPy: No module named 'numpy'</code>，可我用<code>pip list</code>命令查看，确实是有<code>numpy</code>包的。</p>
+</li>
+</ol>
+<p>仅仅这两点，就让我万分困惑。由于自己也是初学者，对这些 build 这些操作也不太了解，我便求助于万能的豆包。他给了我一堆奇怪的指导，比如，让我用如下命令强制CUDA的编译环境，让我卸载依赖在重装，部分“馊主意”如下所示：</p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">:: <span class="number">1</span>. 激活你的mamba-base环境（关键：确保用适配CUDA12.<span class="number">6</span>的torch）</span><br><span class="line">conda activate mamba-base</span><br><span class="line"></span><br><span class="line">:: <span class="number">2</span>. 切换到causal-conv1d源码目录</span><br><span class="line"><span class="built_in">cd</span> F:\Temp\Mamba\causal-conv1d</span><br><span class="line"></span><br><span class="line">:: <span class="number">3</span>. 清理历史编译缓存（避免旧文件干扰）</span><br><span class="line"><span class="built_in">rd</span> /s /q build dist causal_conv1d.egg-info</span><br><span class="line"></span><br><span class="line">:: <span class="number">4</span>. 设置强制CUDA编译的环境变量（指定CUDA12.<span class="number">6</span>路径）</span><br><span class="line"><span class="built_in">set</span> FORCE_CUDA=<span class="number">1</span></span><br><span class="line"><span class="built_in">set</span> CUDA_HOME=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.<span class="number">6</span></span><br><span class="line"><span class="built_in">set</span> <span class="built_in">PATH</span>=<span class="variable">%CUDA_HOME%</span>\bin;<span class="variable">%PATH%</span></span><br><span class="line"></span><br><span class="line">:: <span class="number">5</span>. 安装编译依赖（确保版本匹配）</span><br><span class="line">pip install numpy==<span class="number">1</span>.<span class="number">26</span>.<span class="number">4</span> ninja setuptools-scm wheel --upgrade</span><br><span class="line"></span><br><span class="line">:: <span class="number">6</span>. 核心：编译+安装（带详细日志，方便排查最后问题）</span><br><span class="line">pip install . --no-cache-<span class="built_in">dir</span> --verbose</span><br></pre></td></tr></table></figure>
+<p>他还提出了个新命令的编译技巧：<code>pip install . -v --no-build-isolation</code>，其中<code>-v</code>可以显示编译的详细信息，<code>--no-build-isolation</code>可以不隔绝编译环境。豆包解释是预编译让其默认用了2.9.1+cpu的torch。这里折腾了半天，我是真没招了……</p>
+<h2 id="无语！虚拟机接不上显卡">无语！虚拟机接不上显卡</h2>
+<p>上面方法行不通，那我当然要区寻找别的方法。我更加深入查找了Mamba配置，发现<strong>Mamba是基于SSM实现的序列数据处理模型，其核心算子包括选择性扫描（</strong> <strong>Selective</strong> <strong>scan）等目前只有Linux版本</strong>，这是一个不幸的消息。但我不可能现在去重装一个系统来整这个玩意儿，那我宝贵的资料岂不是全没了；租服务器又太过昂贵，孩子也承担不起。这不，最近正好在玩Ubuntu20.04，在上面搭建博客，然后做些美化什么的，可以拉出来溜溜了。</p>
+<p>我在上面先安装了CUDAv11.8的Toolkits，这可真是个耗时且耗内存的工作（事实上感觉我的时间全都在等这些乱七八糟的东西去了），用<code>nvcc -V</code>查看了一下版本，确实是正常的。但是我用<code>nvidia-smi</code>查看显卡时，发现这个根本显示不出来？这让我很困惑。询问了一下豆包，解释如下：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="strong">**你使用的是 VMware 虚拟机，虚拟机内的显卡是 VMware 模拟的 SVGA II Adapter，并非 NVIDIA 物理显卡**</span> —— 这也是为什么<span class="code">`nvidia-smi`</span>无法运行、找不到任何 NVIDIA 驱动 / 模块的根本原因。</span><br><span class="line"></span><br><span class="line"><span class="bullet">1.</span> <span class="code">`nvcc -V`</span>能显示：仅说明你安装了 CUDA Toolkit（编译器工具链），但 CUDA 的运行依赖 NVIDIA GPU 硬件，虚拟机默认不具备；</span><br><span class="line"><span class="bullet">2.</span> 虚拟机的模拟显卡（VMware SVGA）不支持 NVIDIA 驱动，因此<span class="code">`nvidia-smi`</span>必然无法运行；</span><br><span class="line"><span class="bullet">3.</span> 你的操作环境（VMware 虚拟机）本身就不满足 NVIDIA GPU/CUDA 运行的硬件条件。</span><br></pre></td></tr></table></figure>
+<p>无语了……我的VMware并不可以开启 GPU 直通，我真没招了。</p>
+<h2 id="沉淀！重装一遍就一遍">沉淀！重装一遍就一遍</h2>
+<p>还能怎么办，继续回到windows呗。</p>
+<p>在查找教程过程中我发现<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/730762134">Mamba代码跑起来，Windows全流程配置，VScode调试</a>提到，配置causal-conv1d环境需要用到VS2019，2022不支持，更何况我还是2026的版本！！！我真的吐了啊！！</p>
+<p>在csdn上继续查找，看到了这么一个帖子：<a target="_blank" rel="noopener" href="https://blog.csdn.net/m0_48107660/article/details/143192522">Windows系统下安装causal_conv1d和mamba_ssm_causal-conv1d windows安装</a>，“山重水复疑无路，柳暗花明又一村”，这算是指明了一条可以修改的路。于是我又燃起了希望，打算这一次从CUDA重装11.8版本，pytorch也都重新配套一遍，同时参考<a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_39101719/article/details/145800219">Windows11配置Mamba环境_windows安装mamba</a>这篇博客，争取这一遍能一次性通过（就是可怜了我的电脑，好不容易给C盘腾出了点空间，现在又被塞了乱起八糟的一堆qwq）。</p>
+<p>重装后新建了个mamba环境，调整了环境变量，将<code>CUDAv11_8</code>作为主要配置，重新安装<code>torch 2.1.1+cu118</code>等，这些都是安装yolo系列的必备操作了。此时mamba环境下运行测试程序：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torch  <span class="comment"># 如果pytorch安装成功即可导入</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(torch.cuda.is_available())  <span class="comment"># 查看CUDA是否可用</span></span><br><span class="line"><span class="built_in">print</span>(torch.cuda.device_count())  <span class="comment"># 查看可用的CUDA数量</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;PyTorch版本: <span class="subst">&#123;torch.__version__&#125;</span>&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;CUDA是否可用: <span class="subst">&#123;torch.cuda.is_available()&#125;</span>&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;CUDA版本: <span class="subst">&#123;torch.version.cuda&#125;</span>&quot;</span>)</span><br></pre></td></tr></table></figure>
+<p>输出为：</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="literal">True</span></span><br><span class="line"><span class="number">1</span></span><br><span class="line">PyTorch版本: <span class="number">2.1</span><span class="number">.1</span>+cu118</span><br><span class="line">CUDA是否可用: <span class="literal">True</span></span><br><span class="line">CUDA版本: <span class="number">11.8</span></span><br></pre></td></tr></table></figure>
+<p>跟着教程，对<code>causal_conv1d</code>的<code>setup.py</code>文件核心改动在：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">FORCE_BUILD = os.getenv(<span class="string">&quot;CAUSAL_CONV1D_FORCE_BUILD&quot;</span>, <span class="string">&quot;FALSE&quot;</span>) == <span class="string">&quot;TRUE&quot;</span></span><br><span class="line">SKIP_CUDA_BUILD = os.getenv(<span class="string">&quot;CAUSAL_CONV1D_SKIP_CUDA_BUILD&quot;</span>, <span class="string">&quot;FALSE&quot;</span>) == <span class="string">&quot;TRUE&quot;</span></span><br><span class="line"><span class="comment"># For CI, we want the option to build with C++11 ABI since the nvcr images use C++11 ABI</span></span><br><span class="line">FORCE_CXX11_ABI = os.getenv(<span class="string">&quot;CAUSAL_CONV1D_FORCE_CXX11_ABI&quot;</span>, <span class="string">&quot;FALSE&quot;</span>) == <span class="string">&quot;TRUE&quot;</span></span><br></pre></td></tr></table></figure>
+<p>改为：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># FORCE_BUILD意味着是否强制构建，True则从头构建，False则优先用预编译包</span></span><br><span class="line">FORCE_BUILD = os.getenv(<span class="string">&quot;CAUSAL_CONV1D_FORCE_BUILD&quot;</span>, <span class="string">&quot;FALSE&quot;</span>) == <span class="string">&quot;FALSE&quot;</span></span><br><span class="line"><span class="comment"># SKIP_CUDA_BUILD意味着是否跳过CUDA编译版本，True跳过，False不跳过</span></span><br><span class="line">SKIP_CUDA_BUILD = os.getenv(<span class="string">&quot;CAUSAL_CONV1D_SKIP_CUDA_BUILD&quot;</span>, <span class="string">&quot;FALSE&quot;</span>) == <span class="string">&quot;FALSE&quot;</span></span><br><span class="line"><span class="comment"># False意味着是否强制使用 C++11 ABI编译</span></span><br><span class="line">FORCE_CXX11_ABI = os.getenv(<span class="string">&quot;CAUSAL_CONV1D_FORCE_CXX11_ABI&quot;</span>, <span class="string">&quot;FALSE&quot;</span>) == <span class="string">&quot;FALSE&quot;</span></span><br></pre></td></tr></table></figure>
+<p>说实话，这些变量到底结果是True还是False我也不知道，可能这意味着我的编译直接跳过了CUDA，这会导致我的运行速度可能更慢。不过编译后的结果确实非常乐观：</p>
+<p><img src="causal_conv1d_success.png" alt="成功编译causal_conv1d"></p>
+<p>成功一步，那就意味着后面也有戏！mamba的setup.py出现了和刚ee刚一样的报错，但是现在我毫不担心了！</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">(mamba) PS F:\Temp\Mamba\mamba-main&gt; pip install .</span><br><span class="line">Processing f:\temp\mamba\mamba-main</span><br><span class="line">  Installing build dependencies ... <span class="keyword">done</span></span><br><span class="line">  Getting requirements to build wheel ... error</span><br><span class="line">  error: subprocess-exited-with-error</span><br><span class="line"></span><br><span class="line">  × Getting requirements to build wheel did not run successfully.</span><br><span class="line">  │ <span class="built_in">exit</span> code: 1</span><br><span class="line">  ╰─&gt; [23 lines of output]</span><br><span class="line">      C:\Users\24541\AppData\Local\Temp\pip-build-env-c5i3t7h8\overlay\Lib\site-packages\torch\_subclasses\functional_tensor.py:279: UserWarning: Failed to initialize NumPy: No module named <span class="string">&#x27;numpy&#x27;</span> (Triggered internally at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\utils\tensor_numpy.cpp:84.)</span><br><span class="line">        cpu = _conversion_method_template(device=torch.device(<span class="string">&quot;cpu&quot;</span>))</span><br><span class="line">      &lt;string&gt;:118: UserWarning: mamba_ssm was requested, but nvcc was not found.  Are you sure your environment has nvcc available?  If you<span class="string">&#x27;re installing within a container from https://hub.docker.com/r/pytorch/pytorch, only images whose names contain &#x27;</span>devel<span class="string">&#x27; will provide nvcc.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">      torch.__version__  = 2.9.1+cpu</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">      Traceback (most recent call last):</span></span><br><span class="line"><span class="string">        File &quot;D:\Anaconda\envs\mamba\lib\site-packages\pip\_vendor\pyproject_hooks\_in_process\_in_process.py&quot;, line 389, in &lt;module&gt;</span></span><br><span class="line"><span class="string">          main()</span></span><br><span class="line"><span class="string">        File &quot;D:\Anaconda\envs\mamba\lib\site-packages\pip\_vendor\pyproject_hooks\_in_process\_in_process.py&quot;, line 373, in main</span></span><br><span class="line"><span class="string">          json_out[&quot;return_val&quot;] = hook(**hook_input[&quot;kwargs&quot;])</span></span><br><span class="line"><span class="string">        File &quot;D:\Anaconda\envs\mamba\lib\site-packages\pip\_vendor\pyproject_hooks\_in_process\_in_process.py&quot;, line 143, in get_requires_for_build_wheel</span></span><br><span class="line"><span class="string">          return hook(config_settings)</span></span><br><span class="line"><span class="string">        File &quot;C:\Users\24541\AppData\Local\Temp\pip-build-env-c5i3t7h8\overlay\Lib\site-packages\setuptools\build_meta.py&quot;, line 331, in get_requires_for_build_wheel</span></span><br><span class="line"><span class="string">          return self._get_build_requires(config_settings, requirements=[])</span></span><br><span class="line"><span class="string">        File &quot;C:\Users\24541\AppData\Local\Temp\pip-build-env-c5i3t7h8\overlay\Lib\site-packages\setuptools\build_meta.py&quot;, line 301, in _get_build_requires</span></span><br><span class="line"><span class="string">          self.run_setup()</span></span><br><span class="line"><span class="string">        File &quot;C:\Users\24541\AppData\Local\Temp\pip-build-env-c5i3t7h8\overlay\Lib\site-packages\setuptools\build_meta.py&quot;, line 317, in run_setup</span></span><br><span class="line"><span class="string">          exec(code, locals())</span></span><br><span class="line"><span class="string">        File &quot;&lt;string&gt;&quot;, line 175, in &lt;module&gt;</span></span><br><span class="line"><span class="string">      NameError: name &#x27;</span>bare_metal_version<span class="string">&#x27; is not defined</span></span><br><span class="line"><span class="string">      [end of output]</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">  note: This error originates from a subprocess, and is likely not a problem with pip.</span></span><br><span class="line"><span class="string">ERROR: Failed to build &#x27;</span>file:///F:/Temp/Mamba/mamba-main<span class="string">&#x27; when getting requirements to build wheel</span></span><br></pre></td></tr></table></figure>
+<p>将<code>setup.py</code>同样修改：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">FORCE_BUILD = os.getenv(<span class="string">&quot;MAMBA_FORCE_BUILD&quot;</span>, <span class="string">&quot;FALSE&quot;</span>) == <span class="string">&quot;TRUE&quot;</span></span><br><span class="line">SKIP_CUDA_BUILD = os.getenv(<span class="string">&quot;MAMBA_SKIP_CUDA_BUILD&quot;</span>, <span class="string">&quot;FALSE&quot;</span>) == <span class="string">&quot;TRUE&quot;</span></span><br></pre></td></tr></table></figure>
+<p>为：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">FORCE_BUILD = os.getenv(<span class="string">&quot;MAMBA_FORCE_BUILD&quot;</span>, <span class="string">&quot;FALSE&quot;</span>) == <span class="string">&quot;FALSE&quot;</span></span><br><span class="line">SKIP_CUDA_BUILD = os.getenv(<span class="string">&quot;MAMBA_SKIP_CUDA_BUILD&quot;</span>, <span class="string">&quot;FALSE&quot;</span>) == <span class="string">&quot;FALSE&quot;</span></span><br></pre></td></tr></table></figure>
+<p>以及对<code>mamba_ssm/ops/selective_scan_interface.py</code>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># import selective_scan_cuda # 注释掉这一句</span></span><br></pre></td></tr></table></figure>
+<p>selective_scan_fn函数改为：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">selective_scan_fn</span>(<span class="params">u, delta, A, B, C, D=<span class="literal">None</span>, z=<span class="literal">None</span>, delta_bias=<span class="literal">None</span>, delta_softplus=<span class="literal">False</span>,</span></span><br><span class="line"><span class="params">                     return_last_state=<span class="literal">False</span></span>):</span><br><span class="line">    <span class="string">&quot;&quot;&quot;if return_last_state is True, returns (out, last_state)</span></span><br><span class="line"><span class="string">    last_state has shape (batch, dim, dstate). Note that the gradient of the last state is</span></span><br><span class="line"><span class="string">    not considered in the backward pass.</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="keyword">return</span> selective_scan_ref(u, delta, A, B, C, D, z, delta_bias, delta_softplus, return_last_state)</span><br></pre></td></tr></table></figure>
+<p>mamba_inner_fn函数改为：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">mamba_inner_fn</span>(<span class="params"></span></span><br><span class="line"><span class="params">    xz, conv1d_weight, conv1d_bias, x_proj_weight, delta_proj_weight,</span></span><br><span class="line"><span class="params">    out_proj_weight, out_proj_bias,</span></span><br><span class="line"><span class="params">    A, B=<span class="literal">None</span>, C=<span class="literal">None</span>, D=<span class="literal">None</span>, delta_bias=<span class="literal">None</span>, B_proj_bias=<span class="literal">None</span>,</span></span><br><span class="line"><span class="params">    C_proj_bias=<span class="literal">None</span>, delta_softplus=<span class="literal">True</span></span></span><br><span class="line"><span class="params"></span>):</span><br><span class="line">    <span class="keyword">return</span> mamba_inner_ref(xz, conv1d_weight, conv1d_bias, x_proj_weight, delta_proj_weight,</span><br><span class="line">                              out_proj_weight, out_proj_bias,</span><br><span class="line">                              A, B, C, D, delta_bias, B_proj_bias, C_proj_bias, delta_softplus)</span><br></pre></td></tr></table></figure>
+<p>重新<code>pip install .</code>后结果也成功了：</p>
+<p><img src="mamba_ssm_success.png" alt="成功编译mamba_ssm"></p>
+<h2 id="终于！拨开迷雾见青天">终于！拨开迷雾见青天</h2>
+<p>到这里为止环境基本上配置完了，写一个<code>mamba_test</code>代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"><span class="keyword">from</span> mamba_ssm <span class="keyword">import</span> Mamba</span><br><span class="line"></span><br><span class="line">batch, length, dim = <span class="number">2</span>, <span class="number">64</span>, <span class="number">16</span></span><br><span class="line">x = torch.randn(batch, length, dim).to(<span class="string">&quot;cuda&quot;</span>)</span><br><span class="line">model = Mamba(</span><br><span class="line">    <span class="comment"># This module uses roughly 3 * expand * d_model^2 parameters</span></span><br><span class="line">    d_model=dim,  <span class="comment"># Model dimension d_model</span></span><br><span class="line">    d_state=<span class="number">16</span>,  <span class="comment"># SSM state expansion factor</span></span><br><span class="line">    d_conv=<span class="number">4</span>,  <span class="comment"># Local convolution width</span></span><br><span class="line">    expand=<span class="number">2</span>,  <span class="comment"># Block expansion factor</span></span><br><span class="line">).to(<span class="string">&quot;cuda&quot;</span>)</span><br><span class="line">y = model(x)</span><br><span class="line"><span class="keyword">assert</span> y.shape == x.shape</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;success&#x27;</span>)</span><br></pre></td></tr></table></figure>
+<p>运行，美美等着成功，然而——</p>
+<p><img src="mamba_test_failure.png" alt="mamba_test运行失败"></p>
+<p>查了一下，这不是什么大问题，就是说<strong>PyTorch 版本与 Transformers 版本不兼容</strong>，我的Transforner是4.57.3版本，需要<code>register_pytree_node</code>接口只在pytorch2.2版本以上才有，好吧那就把torch卸载了再重来吧~</p>
+<p>最后装上后运行总算看到了令人喜悦的结果:</p>
+<p><img src="final_succees.png" alt="最终完全成功啦！"></p>
+<h2 id="总结">总结</h2>
+<p>首先pytorch配置得是2.2以上，才能和Transformer兼容；</p>
+<p>其次对causal_conv1d和mamba_ssm这两个包，由于本来就是为Linux系统而配备的，现在也没有出现专门对Windows系统准备的包，必须要手动编译，而手动编译可能出现很多问题，需要对<code>setup.py</code>函数自行修改。</p>
+<p>真是累人的一天，配个环境就耗费了一天了，这论文怎么才能写出头啊……</p>
+
+        
+      </div>
+
+         
+    </div>
+    
+     
+  </div>
+  
+    
+<nav id="article-nav">
+  <a class="article-nav-btn left "
+    
+      href="/2025/12/28/hello-world/"
+      title="Hello World"
+     >
+    <i class="fa-solid fa-angle-left"></i>
+    <p class="title-text">
+      
+        Hello World
+        
+    </p>
+  </a>
+  <a class="article-nav-btn right  disabled "
+     >
+
+    <p class="title-text">
+        
+    </p>
+    <i class="fa-solid fa-angle-right"></i>
+  </a>
+</nav>
+
+
+  
+</article>
+
+
+
+
+
+
+    </div>
+    <div id="footer-wrapper">
+      <footer id="footer">
+  
+  <div id="footer-info" class="inner">
+    
+    &copy; 2025 Hucxious<br>
+    Powered by <a href="https://hexo.io/" target="_blank">Hexo</a> & Theme <a target="_blank" rel="noopener" href="https://github.com/saicaca/hexo-theme-vivia">Vivia</a>
+  </div>
+</footer>
+
+    </div>
+    <div class="back-to-top-wrapper">
+    <button id="back-to-top-btn" class="back-to-top-btn hide" onclick="topFunction()">
+        <i class="fa-solid fa-angle-up"></i>
+    </button>
+</div>
+
+<script>
+    function topFunction() {
+        window.scroll({ top: 0, behavior: 'smooth' });
+    }
+    let btn = document.getElementById('back-to-top-btn');
+    function scrollFunction() {
+        if (document.body.scrollTop > 600 || document.documentElement.scrollTop > 600) {
+            btn.classList.remove('hide')
+        } else {
+            btn.classList.add('hide')
+        }
+    }
+    window.onscroll = function() {
+        scrollFunction();
+    }
+</script>
+
+  </div>
+  <script src="/js/light-dark-switch.js"></script>
+</body>
+</html>
